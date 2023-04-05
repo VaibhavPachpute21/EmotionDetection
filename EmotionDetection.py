@@ -5,8 +5,8 @@ from tensorflow.keras.preprocessing import image
 import cv2
 import numpy as np
 
-face_classifier = cv2.CascadeClassifier(r'E:\Haunted House\3rd Year\miniproject\ProjectFiles\haarcascade_frontalface_default.xml')
-classifier =load_model(r'E:\Haunted House\3rd Year\miniproject\ProjectFiles\model.h5')
+face_classifier = cv2.CascadeClassifier(r'E:\\Haunted House\\3rd Year\SEM 5\\miniproject\\Emotion Detection\\haarcascade_frontalface_default.xml')
+classifier =load_model(r'E:\\Haunted House\\3rd Year\SEM 5\\miniproject\\Emotion Detection\\model.h5')
 
 emotion_labels = ['Angry','Disgust','Fear','Happy','Neutral', 'Sad', 'Surprise']
 
