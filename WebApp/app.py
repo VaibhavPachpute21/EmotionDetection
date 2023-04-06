@@ -46,7 +46,7 @@ def gen_frames():
                             'happy', 'sad', 'surprise', 'neutral']
                 predicted_emotion = emotions[max_index]
                 print(predicted_emotion)
-                print(predictions)
+                print(str(predictions[0]).replace(' ', ','))
                 cv2.putText(frame, predicted_emotion, (int(x), int(y)),
                             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
@@ -86,8 +86,10 @@ def getEmotion():
                             'happy', 'sad', 'surprise', 'neutral']
                 predicted_emotion = emotions[max_index]
                 print(predicted_emotion)
-                print(predictions)
-                return predicted_emotion
+                predictions = str(predictions[0]).replace(' ', ',')
+                obj = [predicted_emotion, predictions]
+
+                return obj
 
 
 @app.route('/video_feed')
@@ -95,11 +97,18 @@ def video_feed():
     return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
-
 @app.route('/')
 def index():
-    predicted_emotion = getEmotion()
-    return render_template('index.html', predicted_emotion=predicted_emotion)
+    obj = getEmotion()
+    angry = obj[1].split(',')[0].replace('[', '').replace(']', '')
+    disgust = obj[1].split(',')[1].replace('[', '').replace(']', '')
+    fear = obj[1].split(',')[2].replace('[', '').replace(']', '')
+    happy = obj[1].split(',')[3].replace('[', '').replace(']', '')
+    sad = obj[1].split(',')[4].replace('[', '').replace(']', '')
+    surprise = obj[1].split(',')[5].replace('[', '').replace(']', '')
+    neutral = obj[1].split(',')[6].replace('[', '').replace(']', '')
+
+    return render_template('index.html', predicted_emotion=obj[0], angry=angry, disgust=disgust, fear=fear, happy=happy, sad=sad, surprise=surprise, neutral=neutral, pred=obj[1])
 
 
 if __name__ == '__main__':
