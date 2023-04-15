@@ -92,6 +92,12 @@ def getEmotion():
                 return obj
 
 
+@app.route('/get_emotion_data')
+def datares():
+    obj = getEmotion()
+    return Response(obj[1])
+
+
 @app.route('/video_feed')
 def video_feed():
     return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')

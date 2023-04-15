@@ -33,20 +33,54 @@
         </div>
       </div>
       <div class="bg-light col-lg-8 offset-2 mt-5 mb-5 border border-primary rounded p-3">
-        <div><h2>Predicted emotion: <strong>{{ predicted_emotion }}</strong></h2></div>
+        <div>
+          <h2>Predicted emotion: <strong>{{ predicted_emotion }}</strong></h2>
+        </div>
         <!-- <h2 id="pred">{{pred}}</h2> -->
         <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+
       </div>
     </div>
   </div>
+
+  <!-- <script type="text/javascript">
+    function updateGraph() {
+      // Update the graph data here
+      var xValues = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral'];
+      var yValues = [{{angry}} , {{disgust}} ,{{fear}}, {{happy}}, {{sad}},{{surprise}},{{neutral}}];
+      var barColors = ["#FF5733", "#8B8B83", "#2F4F4F", "#FFC300", "#2B2B2B","#FFD700","#D3D3D3"];
+  
+      // Redraw the chart
+      var chart = new Chart("myChart", {
+        type: "bar",
+        data: {
+          labels: xValues,
+          datasets: [{
+            backgroundColor: barColors,
+            data: yValues
+          }]
+        },
+        options: {
+          legend: { display: false },
+          title: {
+            display: true,
+            text: "Analysis Data Graph"
+          }
+        }
+      });
+    }
+  
+    setInterval(updateGraph, 1000);
+  </script>
+   -->
   
   <script type="text/javascript">
 
     var xValues = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral'];
-    var yValues = [{{angry}} , {{disgust}} ,{{fear}}, {{happy}}, {{sad}},{{surprise}},{{neutral}}];
-    var barColors = ["#FF5733", "#8B8B83", "#2F4F4F", "#FFC300", "#2B2B2B","#FFD700","#D3D3D3"];
+    var yValues = [{{ angry }} , { { disgust } } , { { fear } }, { { happy } }, { { sad } }, { { surprise } }, { { neutral } }];
+    var barColors = ["#FF5733", "#8B8B83", "#2F4F4F", "#FFC300", "#2B2B2B", "#FFD700", "#D3D3D3"];
 
-    new Chart("myChart", {
+    var chart = new Chart("myChart", {
       type: "bar",
       data: {
         labels: xValues,
@@ -63,6 +97,17 @@
         }
       }
     });
+
+    function updateChart() {
+      fetch('/get_emotion_data')
+        .then(response => response.json())
+        .then(data => {
+          console.log(data)
+          chart.data.datasets[0].data = data;
+          chart.update();
+        });
+    }
+    setInterval(updateChart, 1000);
   </script>
 
 </body>
