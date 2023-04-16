@@ -1,4 +1,5 @@
 import json
+import re
 from flask import Flask, render_template, Response, request
 import requests
 from bs4 import BeautifulSoup
@@ -7,8 +8,8 @@ import numpy as np
 from tensorflow.keras.models import model_from_json
 from tensorflow.keras.preprocessing import image
 
-model = model_from_json(open("fer.json", "r").read())
-model.load_weights('fer.h5')
+model = model_from_json(open("./models/model.json", "r").read())
+model.load_weights('./models/model.h5')
 
 face_haar_cascade = cv2.CascadeClassifier(
     'haarcascade_frontalface_default.xml')
@@ -30,7 +31,7 @@ def gen_frames():
                 gray_img, 1.32, 5)
 
             for (x, y, w, h) in faces_detected:
-                print('WORKING')
+                # print('WORKING')
                 cv2.rectangle(frame, (x, y), (x+w, y+h),
                               (255, 0, 0), thickness=7)
                 roi_gray = gray_img[y:y+w, x:x+h]
@@ -45,8 +46,8 @@ def gen_frames():
                 emotions = ['angry', 'disgust', 'fear',
                             'happy', 'sad', 'surprise', 'neutral']
                 predicted_emotion = emotions[max_index]
-                print(predicted_emotion)
-                print(str(predictions[0]).replace(' ', ','))
+                # print(predicted_emotion)
+                # print(str(predictions[0]).replace(' ', ','))
                 cv2.putText(frame, predicted_emotion, (int(x), int(y)),
                             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
@@ -70,7 +71,7 @@ def getEmotion():
                 gray_img, 1.32, 5)
 
             for (x, y, w, h) in faces_detected:
-                print('WORKING')
+                # print('WORKING')
                 cv2.rectangle(frame, (x, y), (x+w, y+h),
                               (255, 0, 0), thickness=7)
                 roi_gray = gray_img[y:y+w, x:x+h]
@@ -86,14 +87,24 @@ def getEmotion():
                             'happy', 'sad', 'surprise', 'neutral']
                 predicted_emotion = emotions[max_index]
                 print(predicted_emotion)
-                predictions = str(predictions[0]).replace(' ', ',')
-                obj = [predicted_emotion, predictions]
+                pattern = r'\d+\.\d+(?:[eE]-?\d+)?'
+                predictions=[float(n) for n in re.findall(pattern, str(predictions[0]))]
+                # predictions = str(predictions[0]).replace(' ', ',')
+                print('++++++++++')
+                print(predictions)
+                print('++++++++++')
+                obj = [predicted_emotion, str(predictions)]
 
                 return obj
 
 
 @app.route('/get_emotion_data')
-def datares():
+def get_emotion_data():
+    obj = getEmotion()
+    return obj[1]
+
+@app.route('/json_data')
+def json_data():
     obj = getEmotion()
     return Response(obj[1])
 
@@ -106,15 +117,17 @@ def video_feed():
 @app.route('/')
 def index():
     obj = getEmotion()
-    angry = obj[1].split(',')[0].replace('[', '').replace(']', '')
-    disgust = obj[1].split(',')[1].replace('[', '').replace(']', '')
-    fear = obj[1].split(',')[2].replace('[', '').replace(']', '')
-    happy = obj[1].split(',')[3].replace('[', '').replace(']', '')
-    sad = obj[1].split(',')[4].replace('[', '').replace(']', '')
-    surprise = obj[1].split(',')[5].replace('[', '').replace(']', '')
-    neutral = obj[1].split(',')[6].replace('[', '').replace(']', '')
+    # angry = str(obj[1]).split(',')[0].replace('[', '').replace(']', '')
+    # disgust = str(obj[1]).split(',')[1].replace('[', '').replace(']', '')
+    # fear = str(obj[1]).split(',')[2].replace('[', '').replace(']', '')
+    # happy = str(obj[1]).split(',')[3].replace('[', '').replace(']', '')
+    # sad = str(obj[1]).split(',')[4].replace('[', '').replace(']', '')
+    # surprise = str(obj[1]).split(',')[5].replace('[', '').replace(']', '')
+    # neutral = str(obj[1]).split(',')[6].replace('[', '').replace(']', '')
+    # angry=angry, disgust=disgust, fear=fear, happy=happy, sad=sad, surprise=surprise, neutral=neutral, 
+    json_data = json.dumps({'data': obj[1]})
 
-    return render_template('index.html', predicted_emotion=obj[0], angry=angry, disgust=disgust, fear=fear, happy=happy, sad=sad, surprise=surprise, neutral=neutral, pred=obj[1])
+    return render_template('index.html', predicted_emotion=obj[0],pred=obj[1], json_data=json_data)
 
 
 if __name__ == '__main__':
