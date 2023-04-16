@@ -36,8 +36,11 @@
           <h2>Predicted emotion: <strong>{{ predicted_emotion }}</strong></h2>
 
           <div class="row">
-            <div class="col-md-6"> <canvas id="barGraph" style="min-height: 300px;"></canvas></div>
+            <div class="col-md-6"> <canvas id="barGraph"></canvas></div>
             <div class="col-md-6"> <canvas id="doughnutGraph"></canvas></div>
+          </div>
+          <div class="row">
+            <div class="col-md-12"><canvas id="lineGraph" style="min-height: 300px;"></canvas></div>
           </div>
 
         </div>
@@ -46,7 +49,45 @@
     </div>
   </div>
 
+  <!-- <script type="text/javascript">
+
+    var xValues = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral'];
+    var yValues = [0, 0, 0, 0, 0, 0, 0];
+    var barColors = ["#FF5733", "#8B8B83", "#2F4F4F", "#FFC300", "#2B2B2B", "#FFD700", "#D3D3D3"];
+
+
+    function updateChart() {
+      fetch('/get_emotion_data')
+        .then(response => response.json())
+        .then(data => {
+          console.log(data)
+          chart.data.datasets[0].data = data;
+          chart.update();
+        });
+    }
+    setInterval(updateChart, 1000);
+  </script>
+
   <script type="text/javascript">
+
+    var xValues = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral'];
+    var yValues = [0, 0, 0, 0, 0, 0, 0];
+    var barColors = ["#FF5733", "#8B8B83", "#2F4F4F", "#FFC300", "#2B2B2B", "#FFD700", "#D3D3D3"];
+
+
+    // function updateChart1() {
+    //   fetch('/get_emotion_data')
+    //     .then(response => response.json())
+    //     .then(data => {
+    //       console.log(data)
+    //       chart1.data.datasets[0].data = data;
+    //       chart1.update();
+    //     });
+    // }
+    // setInterval(updateChart1, 1000);
+  </script> -->
+
+  <script>
 
     var xValues = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral'];
     var yValues = [0, 0, 0, 0, 0, 0, 0];
@@ -70,23 +111,6 @@
       }
     });
 
-    function updateChart() {
-      fetch('/get_emotion_data')
-        .then(response => response.json())
-        .then(data => {
-          console.log(data)
-          chart.data.datasets[0].data = data;
-          chart.update();
-        });
-    }
-    setInterval(updateChart, 1000);
-  </script>
-
-  <script type="text/javascript">
-
-    var xValues = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral'];
-    var yValues = [0, 0, 0, 0, 0, 0, 0];
-    var barColors = ["#FF5733", "#8B8B83", "#2F4F4F", "#FFC300", "#2B2B2B", "#FFD700", "#D3D3D3"];
 
     var chart1 = new Chart("doughnutGraph", {
       type: "doughnut",
@@ -105,18 +129,62 @@
       }
     });
 
-    function updateChart1() {
+    var chart2 = new Chart("lineGraph", {
+      type: "line",
+      data: {
+        labels: xValues,
+        datasets: [{
+          label: "Emotion Data",
+          data: yValues,
+          borderColor: "#007bff",
+          fill: false
+        }]
+      },
+      options: {
+        legend: {
+          display: false
+        },
+        title: {
+          display: true,
+          text: "Emotion Data Over Time"
+        },
+        scales: {
+          xAxes: [{
+            display: true,
+            scaleLabel: {
+              display: true,
+              labelString: "Emotion"
+            }
+          }],
+          yAxes: [{
+            display: true,
+            scaleLabel: {
+              display: true,
+              labelString: "Count"
+            },
+            ticks: {
+              beginAtZero: true
+            }
+          }]
+        }
+      }
+    });
+
+    function updateChart() {
       fetch('/get_emotion_data')
         .then(response => response.json())
         .then(data => {
-          console.log(data)
+          chart.data.datasets[0].data = data;
           chart1.data.datasets[0].data = data;
+          chart2.data.datasets[0].data = data;
+          chart.update();
           chart1.update();
+          chart2.update();
         });
     }
-    setInterval(updateChart1, 1000);
-  </script>
+    setInterval(updateChart, 1000);
 
+  </script>
 </body>
 
 </html>
